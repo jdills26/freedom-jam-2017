@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="https://inbox-america-data.com/img/favicon.ico">
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- <title>INBOX AMERICA | Predictive Recommender</title> -->
+
+
+<!--   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+
+  <!-- Custom styles for this template -->
+  <link href="{{url_for('static', filename='css/album.css')}}" rel="stylesheet">
+
+
+<style>
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -1px;
+}
+</style>
+
+  </head>
+
+<!-- <script>
+function toggleField(hideObj,showObj){
+  hideObj.disabled=true;        
+  hideObj.style.display='none';
+  showObj.disabled=false;   
+  showObj.style.display='inline';
+  showObj.focus();
+}
+</script> -->
+  <body>
+    <!-- <header>
+      <div class="collapse bg-dark" id="navbarHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+              <h4 class="text-white">About</h4>
+              <p class="text-muted">Project Crystal Ball | Inbox America.</p>
+            </div>
+            <div class="col-sm-4 offset-md-1 py-4">
+              <h4 class="text-white">Contact</h4>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white">Follow us on Twitter</a></li>
+                <li><a href="#" class="text-white">Like us on Facebook</a></li>
+                <li><a href="#" class="text-white">Email us</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar navbar-dark bg-dark box-shadow">
+        <div class="container d-flex justify-content-between">
+          <a href="#" class="navbar-brand d-flex align-items-center">
+      <div class="pr-1"><img alt="" height="20" width="20"  src="https://inbox-america-data.com/img/icon-crystal-ball.png" style="float:left">
+            </div>
+      <strong>Crystal Ball</strong>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+    </header> -->
+
+    <main role="main">
+
+     <!--  <section class="jumbotron text-center">
+        <div class="container">
+          <h1 class="jumbotron-heading">Recommendation Engine</h1>
+          <p class="lead text-muted">This webapp displays for a given customer its past purchase and predicts the most probable future purchases thanks to  business rules and machine learning.</p>
+
+
+
+
+     </div>
+ </div>
+      </section> -->
+
+  <div class="container">
+
+  <div class="alert alert-secondary" role="alert">
+        <h4>Recommendations for client #{{ request.args['query'] | int}}</h4>
+      <hr>
+  </div>
+
+  
+
+    <div class="alert alert-success" role="alert">
+
+    <h5 class="alert-heading">Purchase history</h5>
+      <hr>
+          <table class="table table-bordered">
+            <thead>
+            <tr>
+{%- for column_name, column_display in history_columns %}
+              <th>{{ column_display }}</th>
+{%- endfor %}
+            </tr>
+            </thead>
+
+            <tbody>
+{%- for row_id, row in history_df.iterrows() %}
+            <tr>
+  {%- for column_name, column_display in history_columns %}
+              <td>{{ row[column_name] }}</td>
+  {%- endfor %}
+            </tr>
+{%- endfor %}
+            </tbody>
+
+          </table>
+    <hr>
+  </div>
+
+      <div class="album py-5 bg-light">
+        <div class="container">
+
+{% for batch in recomm_df.iterrows() | batch(3) %}
+          <div class="row">
+
+    {% for row_id, row in batch %}
+
+            <div class="col-md-4">
+            <div class="card-body">
+
+              <h3 align="center">{{ row['CAT1']}}</h3>
+
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top" data-src="holder.js/100px225?theme=thumb&bg=55595c&fg=eceeef&text={{ row['modele_intitule'] }}" alt="Card image cap">
+                <div class="card-body">
+                  <p class="card-text">{{ row['famille_intitule'] }}, {{ row['sous_famille_intitule'] }}, {{ row['model_id'] }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+
+<div class="col">
+       <div class="form-group">
+       <form name="SelectRec" action="/db_add">
+        <label>Client ID</label>
+          <input name="query", value="{{ client_id | int }}" readonly/>
+          </br>
+        <label>Model ID</label>
+          <input name="item", value="{{ row['model_id']}}" readonly/>
+          </br>
+                <input type="submit" value="Confirm">
+              </form>
+          </div>
+
+    <h5> Or make new suggestion below: </h5>            
+
+  <div class="dropdown" id="language">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"> {{ row['CAT1'] }}
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li class="dropdown-submenu">
+      {% for key, value in df4.iterrows() %}
+      {% if value.CAT1 ==row['CAT1'] %}
+        <a class="test" tabindex="-1" href="#"> {{ value.famille_intitule }} <span class="caret"></span></a>
+        <ul class="dropdown-menu" >
+          <li class="dropdown-submenu">
+
+            <a class="test" href="#">{{value.modele_intitule[0] }} <span class="caret"></span></a>
+
+              <ul class="dropdown-menu" id="lang" >
+            
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[0] ==thing2[0] %}
+              <li><a href="#" name="lang" data-val="{{ thing2[1][0] }}">{{ thing2[1][0] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][1] }}">{{ thing2[1][1] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][2] }}">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+
+
+              
+            </ul>
+            {% if value.modele_intitule[1] %}
+            <a class="test" href="#">{{value.modele_intitule[1] }} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[1] ==thing2[0] %}
+              <li><a href="#" name="lang" data-val="{{ thing2[1][0] }}">{{ thing2[1][0] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][1] }}">{{ thing2[1][1] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][2] }}">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+            </ul>
+            {% endif %}
+            {% if value.modele_intitule[2] %}
+            <a class="test" href="#">{{value.modele_intitule[2] }} <span class="caret"></span></a>
+            {% endif %}
+            
+            <ul class="dropdown-menu">
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[2] ==thing2[0] %}
+              <li><a href="#" name="lang" data-val="{{ thing2[1][0] }}">{{ thing2[1][0] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][1] }}">{{ thing2[1][1] }}</a></li>
+              <li><a href="#" name="lang" data-val="{{ thing2[1][2] }}">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+            </ul>
+          </li>
+        </ul>          
+        {% endif %}
+        {% endfor %} 
+      </li>
+    </ul>
+</div>
+</div>
+
+
+
+                    <!-- END -->
+                            <div class="col">
+         
+         </div>
+
+                      <!-- REMOVED THIS!
+                      <div class="btn-group">
+                        <button type="button" class="alert alert-success">Confirmation</button>
+                        <button type="button" class="alert alert-warning">Suggestion</button>
+                      </div>
+                      <small class="text-muted"></small>
+                      -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+    {% endfor %}
+</div>
+{% endfor %}
+<a class="btn btn-primary" href="/" role="button">Back to homepage</a>
+
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="text-muted">
+      <div class="container">
+        <p class="float-right">
+          <!-- <a href="#">Back to top</a> -->
+        </p>
+        <p>Copyright Inbox America Consulting Service | 2018 </p>
+        <p>Visit our website at :<a href="https://www.inbox-america.com"> inbox-america.com</a>.</p>
+      </div>
+    </footer>
+
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+<script type="text/javascript">
+$("#language").click(function(){
+   $("#lang li").slideToggle();
+});
+
+$("#lang li").click(function() {
+    var url = location.href = "/db_add2?item=" + $(this).find('a').attr("data-val") + "&query={{ client_id | int }}";
+   location.href =url;
+});
+</script>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.js"></script>
+
+    <script>
+    $(document).ready(function(){
+      $('.dropdown-submenu a.test').on("click", function(e){
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    });
+    </script>
+
+   </body>
+</html>

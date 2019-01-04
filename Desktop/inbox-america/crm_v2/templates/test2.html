@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -1px;
+}
+</style>
+</head>
+<body>
+   
+<div class="container">
+  <h2>Multi-Level Dropdowns</h2>
+
+  {% for thing in list1 %}
+
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"> Suggestion for: {{ thing }}
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+ 
+      <li class="dropdown-submenu">
+         {% for key, value in df4.iterrows() %}
+      {% if value.CAT1 ==thing %}
+        <a class="test" tabindex="-1" href="#"> {{ value.famille_intitule }} <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+
+
+          <li class="dropdown-submenu">
+            <a class="test" href="#">{{value.modele_intitule[0] }} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[0] ==thing2[0] %}
+              <li><a href="#">{{ thing2[1][0] }}</a></li>
+              <li><a href="#">{{ thing2[1][1] }}</a></li>
+              <li><a href="#">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+            </ul>
+            {% if value.modele_intitule[1] %}
+            <a class="test" href="#">{{value.modele_intitule[1] }} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[1] ==thing2[0] %}
+              <li><a href="#">{{ thing2[1][0] }}</a></li>
+              <li><a href="#">{{ thing2[1][1] }}</a></li>
+              <li><a href="#">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+            </ul>
+            {% endif %}
+            {% if value.modele_intitule[2] %}
+            <a class="test" href="#">{{value.modele_intitule[2] }} <span class="caret"></span></a>
+            {% endif %}
+            <ul class="dropdown-menu">
+            {% for thing2 in list2 %}
+            {% if value.modele_intitule[2] ==thing2[0] %}
+              <li><a href="#">{{ thing2[1][0] }}</a></li>
+              <li><a href="#">{{ thing2[1][1] }}</a></li>
+              <li><a href="#">{{ thing2[1][2] }}</a></li>
+              {% endif %}
+              {% endfor %} 
+            </ul>
+          </li>
+        </ul>          
+        {% endif %}
+        {% endfor %} 
+      </li>
+    </ul>
+  {% endfor %}
+</div>
+
+<script>
+$(document).ready(function(){
+  $('.dropdown-submenu a.test').on("click", function(e){
+    $(this).next('ul').toggle();
+    e.stopPropagation();
+    e.preventDefault();
+  });
+});
+</script>
+
+</body>
+</html>
